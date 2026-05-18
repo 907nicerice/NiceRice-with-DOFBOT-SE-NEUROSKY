@@ -55,6 +55,7 @@ MODEL_LABELS = {
 # line --neuropy-dir and --arm-lib-dir options can override these on any setup.
 KNOWN_NEUROPY_DIR = Path(r"D:\XX\SITP脑机\总体文件\drone")
 KNOWN_ARM_LIB_DIR = Path(r"D:\XX\SITP脑机\机械臂控制\0.py_install\Arm_Lib (Windows)")
+DEFAULT_ARM_PORT = "COM4"
 
 
 @dataclass
@@ -617,7 +618,10 @@ class OptionalEEGModel:
             return
 
         try:
-            checkpoint = torch.load(str(path), map_location="cpu")
+            try:
+                checkpoint = torch.load(str(path), map_location="cpu", weights_only=False)
+            except TypeError:
+                checkpoint = torch.load(str(path), map_location="cpu")
             state_dict = checkpoint.get("model_state_dict") if isinstance(checkpoint, dict) else None
             if state_dict is None:
                 state_dict = checkpoint
@@ -892,9 +896,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Control a robotic arm with NeuroSky / MindWave EEG signals."
     )
-    parser.add_argument("--mindwave-port", default=os.getenv("MINDWAVE_PORT", "COM6"))
+    parser.add_argument(
+        "--mindwave-port",
+        default=os.getenv("MINDWAVE_PORT"),
+        help="NeuroSky / MindWave serial port. If omitted, the program asks before start.",
+    )
     parser.add_argument("--mindwave-baud", type=int, default=57600)
-    parser.add_argument("--arm-port", default=os.getenv("ARM_PORT", "COM4"))
+    parser.add_argument(
+        "--arm-port",
+        default=os.getenv("ARM_PORT"),
+        help="Robotic arm serial port. If omitted in non-dry-run mode, the program asks before start.",
+    )
     parser.add_argument("--model-path", default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--angle-step", type=int, default=5)
@@ -914,6 +926,33 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--arm-lib-dir", default=None)
     parser.add_argument("--log-level", default="INFO")
     return parser
+
+
+def prompt_required_port(prompt: str) -> str:
+    while True:
+        value = input(prompt).strip()
+        if value:
+            return value
+        print("脑环端口不能为空，请输入类似 COM6 或 /dev/ttyUSB0 的端口。")
+
+
+def prompt_optional_port(prompt: str, default: str) -> str:
+    value = input(prompt).strip()
+    return value or default
+
+
+def resolve_interactive_ports(args: argparse.Namespace) -> None:
+    if not args.mindwave_port:
+        args.mindwave_port = prompt_required_port("请输入脑环端口，例如 COM6: ")
+    if args.dry_run:
+        if not args.arm_port:
+            args.arm_port = DEFAULT_ARM_PORT
+        return
+    if not args.arm_port:
+        args.arm_port = prompt_optional_port(
+            f"请输入机械臂端口，例如 COM4，直接回车使用 {DEFAULT_ARM_PORT}: ",
+            DEFAULT_ARM_PORT,
+        )
 
 
 def config_from_args(args: argparse.Namespace) -> BrainArmConfig:
@@ -945,6 +984,7 @@ def config_from_args(args: argparse.Namespace) -> BrainArmConfig:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
+    resolve_interactive_ports(args)
     setup_logging(args.log_level)
 
     try:

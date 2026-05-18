@@ -3,6 +3,10 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Local EEG training outputs
+brain_arm_control/data/
+brain_arm_control/model/
+
 # C extensions
 *.so
 

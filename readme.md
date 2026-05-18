@@ -22,7 +22,7 @@
 ```text
 NiceRice-with-DOFBOT-SE-NEUROSKY/
 ├── brain_arm_control/
-│   ├── brain_arm_control.py   # 脑电窗口采样 + 机械臂控制主程序
+│   ├── brain_arm_control.py   # 脑电窗口采样 + 机械臂控制主程序`n│   ├── collect_training_data.py # 采集 left/right/rest EEG 训练数据`n│   ├── train_eeg_model.py     # 训练可选 FinalModel.pth
 │   └── README.md              # 脑控机械臂详细说明
 ├── keyboard_control/
 │   ├── keyboard_control.py    # 实时键盘控制程序
@@ -125,7 +125,24 @@ python brain_arm_control.py --mindwave-port COM6 --arm-port COM4
 
 如果传入模型但加载失败，程序也不会崩溃，会自动降级回规则控制。
 
-完整说明见：[`brain_arm_control/README.md`](brain_arm_control/README.md)
+
+### 训练可选左右模型
+
+如果要使用 `.pth` 模型，先采集三类训练数据：
+
+```bash
+cd brain_arm_control
+python collect_training_data.py --mindwave-port COM6
+```
+
+再训练模型：
+
+```bash
+python train_eeg_model.py --data-dir data --output model/FinalModel.pth
+```
+
+当前模型只用于 mode 1 左右旋转，输出含义固定为：`0=left`、`1=right`、`2=rest`。它不会控制上/下、前/后或夹爪。
+完整说明见：[rain_arm_control/README.md](brain_arm_control/README.md)
 
 ## 键盘控制机械臂
 
@@ -168,7 +185,7 @@ python keyboard_control.py
 - 做不同使用者的 attention / meditation 阈值校准。
 - 增强眨眼检测和防抖逻辑。
 - 增加离线 EEG 数据记录，用于后续调参和训练。
-- 明确 `.pth` 模型 checkpoint 格式，并补充训练/预测说明。
+- 持续优化 EEG 数据采集、阈值调参和模型训练流程。
 - 逐步扩展 4 号、5 号舵机的脑控模式。
 - 补充接线图、实物照片和演示视频。
 
