@@ -144,7 +144,7 @@ python train_eeg_model.py --data-dir data --output model/FinalModel.pth
 ```
 
 当前模型只用于 mode 1 左右旋转，输出含义固定为：`0=left`、`1=right`、`2=rest`。它不会控制上/下、前/后或夹爪。
-完整说明见：[rain_arm_control/README.md](brain_arm_control/README.md)
+完整说明见：[`brain_arm_control/README.md`](brain_arm_control/README.md)
 
 ## 键盘控制机械臂
 
