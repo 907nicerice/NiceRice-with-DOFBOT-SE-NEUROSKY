@@ -1,4 +1,4 @@
-﻿# NiceRice with DOFBOT-SE + NeuroSky
+# NiceRice with DOFBOT-SE + NeuroSky
 
 > 同济大学 SITP 项目记录：围绕 DOFBOT-SE 机械臂和 NeuroSky / MindWave 脑电头环，整理机械臂键盘控制、脑电信号控制、底层 Arm_Lib 使用和后续实验代码。
 
