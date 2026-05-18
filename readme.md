@@ -22,7 +22,9 @@
 ```text
 NiceRice-with-DOFBOT-SE-NEUROSKY/
 ├── brain_arm_control/
-│   ├── brain_arm_control.py   # 脑电窗口采样 + 机械臂控制主程序`n│   ├── collect_training_data.py # 采集 left/right/rest EEG 训练数据`n│   ├── train_eeg_model.py     # 训练可选 FinalModel.pth
+│   ├── brain_arm_control.py   # 脑电窗口采样 + 机械臂控制主程序
+│   ├── collect_training_data.py # 采集 left/right/rest EEG 训练数据
+│   ├── train_eeg_model.py     # 训练可选 FinalModel.pth
 │   └── README.md              # 脑控机械臂详细说明
 ├── keyboard_control/
 │   ├── keyboard_control.py    # 实时键盘控制程序
